@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Registration_System.Data;
+using Registration_System.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<JwtMethods>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(
