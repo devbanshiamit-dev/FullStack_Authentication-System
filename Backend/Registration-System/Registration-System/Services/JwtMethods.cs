@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Registration_System.Services
 {
-    public class JwtMethods
+    public class JwtMethods : IJwtMethods
     {
         private readonly IConfiguration _conf;
 
