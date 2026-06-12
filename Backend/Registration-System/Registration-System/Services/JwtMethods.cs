@@ -17,7 +17,7 @@ namespace Registration_System.Services
             _conf = conf;
         }
 
-        public string GenerateAccessToken(JwtDTO user)
+        public string GenerateAccessToken(Users user)
         {
             var Claims = new[]
             {
@@ -33,16 +33,27 @@ namespace Registration_System.Services
                 issuer: _conf["Jwt:Issuer"],
                 audience: _conf["Jwt:Audience"],
                 claims: Claims,
-                expires: DateTime.UtcNow.AddDays(Convert.ToInt32(_conf["Jwt:Expiry"])),
+                expires: DateTime.UtcNow.AddHours(Convert.ToInt32(_conf["Jwt:Expiry"])),
                 signingCredentials:credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(Token);
         }
 
-        public string GenerateRefreshToken()
+        public UserRefreshToken GenerateRefreshToken(Users user)
         {
             var Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
-            return Token;
+
+            var userRefreshToken = new UserRefreshToken
+            {
+                RefreshToken = Token,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddDays(Convert.ToInt32(_conf["Jwt:Expiry"])),
+                IsRevoked = false,
+                UserId = user.Id,
+                User = user,
+            };
+
+            return userRefreshToken;
         }
     }
 }
