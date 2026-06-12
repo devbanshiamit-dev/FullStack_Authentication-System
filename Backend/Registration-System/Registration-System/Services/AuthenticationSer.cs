@@ -19,6 +19,8 @@ namespace Registration_System.Services
             _logger = logger;
         }
 
+
+        // NewUser
         public async Task<ResponceDTO?> RegisterAsync(RequestDTO Dto)
         {
             var exist = await _authRepository.GetUserByEmailAsync(Dto.Email);
@@ -48,6 +50,82 @@ namespace Registration_System.Services
             return await GetAllTokensAsync(AddedUser);
         }
 
+        //LogIn
+        public async Task<ResponceDTO?> LoginAsync(LoginDTO Dto)
+        {
+            var ExistingUser = await _authRepository.GetUserByEmailAsync(Dto.Email);
+
+            if (ExistingUser == null)
+            {
+                _logger.LogWarning("Login failed. User not found.");
+                return null;
+            }
+
+            if (!PasswordHasher.VerifyPassword(ExistingUser.Password, Dto.Password))
+            {
+                _logger.LogWarning("Login failed. Invalid password.");
+                return null;
+            }
+
+            _logger.LogInformation("User {Email} logged in successfully", Dto.Email);
+
+            return await GetAllTokensAsync(ExistingUser);
+        }
+
+        //LoginOut
+        public async Task<bool> LogOutAsync(string RefreshToken)
+        {
+            var RefreshEntity = await _authRepository.GetRefreshTokenAsync(RefreshToken);
+            if (RefreshEntity == null)
+            {
+                _logger.LogWarning("Logout failed. Refresh token not found");
+                return false;
+            }
+            await _authRepository.RemoveRefreshTokenAsync(RefreshEntity);
+            return true;
+        }
+        public async Task LogOutFromAllAsync(int Id)
+        {
+            _logger.LogInformation(
+              "Logging out user {UserId} from all devices",
+              Id);
+
+            await _authRepository.RevokeAllRefreshTokensAsync(Id);
+        }
+
+
+        //Getting new Refresh or Access Tokens
+        public async Task<ResponceDTO?> NewTokensAsync(string RefreshToken)
+        {
+            var Existing = await _authRepository.GetRefreshTokenAsync(RefreshToken);
+            if (Existing == null)
+            {
+                _logger.LogWarning("Token not Found");
+                return null;
+            }
+            if(Existing.IsRevoked)
+            {
+                _logger.LogWarning("Invalid Token (GoTo The Login Page)");
+                return null;
+            }
+            if (Existing.ExpiresAt <= DateTime.UtcNow)
+            {
+                _logger.LogWarning("Token already expired");
+                return null;
+            }
+
+            var user = await _authRepository.GetUserByIdAsync(Existing.UserId);
+
+            if (user == null)
+            {
+                _logger.LogWarning("User not Found");
+                return null;
+            }
+
+            await _authRepository.RemoveRefreshTokenAsync(Existing);
+
+            return await GetAllTokensAsync(user);
+        }
 
         // Internal services
         private async Task<ResponceDTO> GetAllTokensAsync(Users user)

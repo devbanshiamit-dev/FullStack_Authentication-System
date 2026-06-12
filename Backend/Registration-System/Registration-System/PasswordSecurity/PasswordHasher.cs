@@ -5,14 +5,12 @@
         // Password ko Hash karne ke liye
         public static string HashPassword(string password)
         {
-            // Yahan '13' work factor hai (iterations). Jitna zyada work factor hoga, utna secure hoga.
-            return BCrypt.Net.BCrypt.EnhancedHashPassword(password, workFactor: 13);
+            return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
-        // Password ko Verify karne ke liye
-        public static bool VerifyPassword(string enteredPassword, string storedHash)
+        public static bool VerifyPassword(string storedHash, string enteredPassword)
         {
-            return BCrypt.Net.BCrypt.EnhancedVerify(enteredPassword, storedHash);
+            return BCrypt.Net.BCrypt.Verify(enteredPassword, storedHash);
         }
     }
 }
