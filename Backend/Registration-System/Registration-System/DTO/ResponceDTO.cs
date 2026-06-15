@@ -2,9 +2,9 @@
 
 namespace Registration_System.DTO
 {
-    public class ResponceDTO
+    public class ResponseDTO
     {
-        public string AcceccToken { get; set; } = string.Empty;
+        public string AccessToken { get; set; } = string.Empty;
         public string RefreshToken { get; set; } = string.Empty;
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Registration_System.Data;
+using Registration_System.Middleware;
 using Registration_System.Repo;
 using Registration_System.Services;
 
@@ -11,7 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IJwtMethods, JwtMethods>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IAuthenticationSer, AuthenticationSer>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(
@@ -20,13 +23,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
+
+app.UseExceptionHandler();
 
 app.UseAuthorization();
 

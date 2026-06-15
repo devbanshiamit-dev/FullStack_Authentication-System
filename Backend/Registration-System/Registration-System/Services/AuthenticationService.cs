@@ -1,18 +1,19 @@
 ﻿using Registration_System.DTO;
+using Registration_System.Exceptions;
 using Registration_System.Models;
 using Registration_System.PasswordSecurity;
 using Registration_System.Repo;
 
 namespace Registration_System.Services
 {
-    public class AuthenticationSer : IAuthenticationSer
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly IJwtMethods _jwtMethods;
         private readonly IAuthRepository _authRepository;
-        private readonly ILogger<AuthenticationSer> _logger;
+        private readonly ILogger<AuthenticationService> _logger;
 
-        public AuthenticationSer(IJwtMethods jwtMethods, IAuthRepository authRepository,
-            ILogger<AuthenticationSer> logger)
+        public AuthenticationService(IJwtMethods jwtMethods, IAuthRepository authRepository,
+            ILogger<AuthenticationService> logger)
         {
             _jwtMethods = jwtMethods;
             _authRepository = authRepository;
@@ -21,13 +22,15 @@ namespace Registration_System.Services
 
 
         // NewUser
-        public async Task<ResponceDTO?> RegisterAsync(RequestDTO Dto)
+        public async Task<ResponseDTO> RegisterAsync(RequestDTO Dto)
         {
             var exist = await _authRepository.GetUserByEmailAsync(Dto.Email);
             if (exist != null)
             {
-                _logger.LogWarning("Email Already Exist");
-                return null;
+                _logger.LogWarning(
+                 "Registration failed. Email {Email} already exists",
+                  Dto.Email);
+                throw new EmailAlreadyExistsException("Email already exists");
             }
 
             _logger.LogInformation("Creating Account");
@@ -51,20 +54,20 @@ namespace Registration_System.Services
         }
 
         //LogIn
-        public async Task<ResponceDTO?> LoginAsync(LoginDTO Dto)
+        public async Task<ResponseDTO> LoginAsync(LoginDTO Dto)
         {
             var ExistingUser = await _authRepository.GetUserByEmailAsync(Dto.Email);
 
             if (ExistingUser == null)
             {
                 _logger.LogWarning("Login failed. User not found.");
-                return null;
+                throw new InvalidCredentialsException("Invalid Email Or Password");
             }
 
             if (!PasswordHasher.VerifyPassword(ExistingUser.Password, Dto.Password))
             {
                 _logger.LogWarning("Login failed. Invalid password.");
-                return null;
+                throw new InvalidCredentialsException("Invalid Password");
             }
 
             _logger.LogInformation("User {Email} logged in successfully", Dto.Email);
@@ -79,7 +82,7 @@ namespace Registration_System.Services
             if (RefreshEntity == null)
             {
                 _logger.LogWarning("Logout failed. Refresh token not found");
-                return false;
+                throw new TokenNotFoundException("Token Not Found");
             }
             await _authRepository.RemoveRefreshTokenAsync(RefreshEntity);
             return true;
@@ -95,23 +98,23 @@ namespace Registration_System.Services
 
 
         //Getting new Refresh or Access Tokens
-        public async Task<ResponceDTO?> NewTokensAsync(string RefreshToken)
+        public async Task<ResponseDTO?> NewTokensAsync(string RefreshToken)
         {
             var Existing = await _authRepository.GetRefreshTokenAsync(RefreshToken);
             if (Existing == null)
             {
                 _logger.LogWarning("Token not Found");
-                return null;
+                throw new UserNotFoundException("Token not found");
             }
             if(Existing.IsRevoked)
             {
                 _logger.LogWarning("Invalid Token (GoTo The Login Page)");
-                return null;
+                throw new TokenRevokedException("Invalid Token, Token is Revoked");
             }
             if (Existing.ExpiresAt <= DateTime.UtcNow)
             {
                 _logger.LogWarning("Token already expired");
-                return null;
+                throw new TokenExpiredException("Token is Expired");
             }
 
             var user = await _authRepository.GetUserByIdAsync(Existing.UserId);
@@ -119,7 +122,7 @@ namespace Registration_System.Services
             if (user == null)
             {
                 _logger.LogWarning("User not Found");
-                return null;
+                throw new UserNotFoundException("Invalid User Id");
             }
 
             await _authRepository.RemoveRefreshTokenAsync(Existing);
@@ -128,16 +131,16 @@ namespace Registration_System.Services
         }
 
         // Internal services
-        private async Task<ResponceDTO> GetAllTokensAsync(Users user)
+        private async Task<ResponseDTO> GetAllTokensAsync(Users user)
         {
             var Access = _jwtMethods.GenerateAccessToken(user);
             var RF = _jwtMethods.GenerateRefreshToken(user);
 
             await _authRepository.AddRefreshTokenAsync(RF);
 
-            return new ResponceDTO
+            return new ResponseDTO
             {
-                AcceccToken = Access,
+                AccessToken = Access,
                 RefreshToken = RF.RefreshToken,
             };
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Registration_System.DTO;
+using Registration_System.Exceptions;
 using Registration_System.Services;
 
 namespace Registration_System.Controllers
@@ -8,9 +9,9 @@ namespace Registration_System.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthenticationSer _authService;
+        private readonly IAuthenticationService _authService;
 
-        public AuthController(IAuthenticationSer authService)
+        public AuthController(IAuthenticationService authService)
         {
             _authService = authService;
         }
@@ -65,6 +66,11 @@ namespace Registration_System.Controllers
             await _authService.LogOutFromAllAsync(userId);
 
             return Ok("Logged out from all devices.");
+        }
+        [HttpGet]
+        public async Task<IActionResult> Demo()
+        {
+            throw new InvalidCredentialsException("Testing");
         }
     }
 }
