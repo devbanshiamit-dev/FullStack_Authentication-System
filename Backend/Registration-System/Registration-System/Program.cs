@@ -3,7 +3,9 @@ using Registration_System.Data;
 using Registration_System.Middleware;
 using Registration_System.Repo;
 using Registration_System.Services;
+//using Microsoft.IdentityModel.Logging;
 
+//IdentityModelEventSource.ShowPII = true;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -31,6 +33,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler();
+
+app.UseMiddleware<AuthenticationMiddleware>();
 
 app.UseAuthorization();
 

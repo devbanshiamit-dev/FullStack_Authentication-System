@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Registration_System.DTO;
-using Registration_System.Exceptions;
 using Registration_System.Services;
+using System.Security.Claims;
 
 namespace Registration_System.Controllers
 {
@@ -67,10 +67,14 @@ namespace Registration_System.Controllers
 
             return Ok("Logged out from all devices.");
         }
-        [HttpGet]
-        public async Task<IActionResult> Demo()
+        [HttpGet("me")]
+        public IActionResult Me()  // For AuthMiddleware Cheking
         {
-            throw new InvalidCredentialsException("Testing");
+            return Ok(new
+            {
+                UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+                Email = User.FindFirst(ClaimTypes.Email)?.Value
+            });
         }
     }
 }

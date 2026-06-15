@@ -1,5 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Registration_System.DTO;
 using Registration_System.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -34,7 +33,7 @@ namespace Registration_System.Services
                 audience: _conf["Jwt:Audience"],
                 claims: Claims,
                 expires: DateTime.UtcNow.AddHours(Convert.ToInt32(_conf["Jwt:Expiry"])),
-                signingCredentials:credentials);
+                signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(Token);
         }
@@ -54,6 +53,39 @@ namespace Registration_System.Services
             };
 
             return userRefreshToken;
+        }
+
+        public ClaimsPrincipal? ValidateToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var key = Encoding.UTF8.GetBytes(_conf["Jwt:Key"]!);
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(
+                    token,
+                    new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = _conf["Jwt:Issuer"],
+                        ValidAudience = _conf["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+
+                        ClockSkew = TimeSpan.Zero
+                    },
+                    out SecurityToken validatedToken);
+
+                return principal;
+            }
+            catch 
+            {
+                return null;
+            }
         }
     }
 }
