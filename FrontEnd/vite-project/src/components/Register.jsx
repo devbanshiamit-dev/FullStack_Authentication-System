@@ -20,18 +20,36 @@ const Register = () => {
     });
 
     const loginUser = async () => {
-        try{
+        try {
             const response = await axios.post(
                 "https://localhost:7020/api/Auth/login",
                 loginData
             );
 
             console.log(response.data);
+            localStorage.setItem("accessToken", response.data.accessToken);
             alert("Login Successful");
 
         } catch (error) {
             console.log(error.response?.data);
         }
+    };
+
+    const loginResponse = async () => {
+        const Token = localStorage.getItem("accessToken");
+
+        try {
+            const response = await axios.get("https://localhost:7020/api/Auth/me", {
+                headers: {
+                    Authorization: `Bearer ${Token}`
+                }
+            });
+            console.log(response.data);
+
+        } catch (error) {
+            console.log(error.response?.data);
+        }
+
     };
 
     const registerUser = async () => {
@@ -59,8 +77,8 @@ const Register = () => {
         });
 
         setLoginData({
-            email:"",
-            password:"",
+            email: "",
+            password: "",
         });
     }
 
@@ -183,7 +201,7 @@ const Register = () => {
                             Submit
                         </button>
 
-                        <button  onClick={clears} className="bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition-all duration-300">
+                        <button onClick={clears} className="bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition-all duration-300">
                             Clear
                         </button>
                     </div>
@@ -215,16 +233,16 @@ const Register = () => {
                         <input
                             type="email"
                             placeholder="Enter Your Emai"
-                            value ={loginData.email}
+                            value={loginData.email}
                             className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/20 text-white
                          placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"
-                         onChange={(e)=>{
-                            setLoginData({
-                                ...loginData,
-                                email: e.target.value
-                            })
-                         }}
-                         />
+                            onChange={(e) => {
+                                setLoginData({
+                                    ...loginData,
+                                    email: e.target.value
+                                })
+                            }}
+                        />
 
                         <input
                             type="password"
@@ -232,13 +250,13 @@ const Register = () => {
                             value={loginData.password}
                             className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/20 text-white
                          placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"
-                         onChange={(e)=>{
-                            setLoginData({
-                                ...loginData,
-                                password: e.target.value
-                            })
-                         }}
-                         />
+                            onChange={(e) => {
+                                setLoginData({
+                                    ...loginData,
+                                    password: e.target.value
+                                })
+                            }}
+                        />
 
                     </div>
 

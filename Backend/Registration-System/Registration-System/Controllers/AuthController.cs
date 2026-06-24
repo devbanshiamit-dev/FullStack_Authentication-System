@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Registration_System.DTO;
 using Registration_System.Services;
 using System.Security.Claims;
@@ -67,6 +68,8 @@ namespace Registration_System.Controllers
 
             return Ok("Logged out from all devices.");
         }
+
+        [Authorize]
         [HttpGet("me")]
         public IActionResult Me()  // For AuthMiddleware Cheking
         {

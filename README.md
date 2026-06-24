@@ -1,93 +1,148 @@
-# 🔐 Full Stack Authentication System (ASP.NET Core Web API)
+# 🔐 Full Stack Authentication System
 
-## 📌 Project Overview
+A modern full-stack authentication system built with ASP.NET Core Web API and React. The project implements secure JWT-based authentication with Refresh Token Rotation, global exception handling, and a responsive animated frontend.
 
-This project is an ASP.NET Core Web API-based authentication system. It currently focuses on building a clean backend structure using the Repository Pattern and managing users and refresh tokens.
+---
 
-The project is in an early development stage and will be extended step by step to include full JWT authentication and advanced security features.
+## 🚀 Features
+
+### Backend Features
+
+* User Registration
+* User Login
+* Password Hashing using BCrypt
+* JWT Access Token Authentication
+* Refresh Token Authentication
+* Refresh Token Rotation
+* Authentication Middleware
+* Global Exception Handling Middleware
+* Repository Pattern Architecture
+* Structured Logging with ILogger
+* Entity Framework Core Integration
+
+### Frontend Features
+
+* Modern React UI
+* Responsive Authentication Pages
+* Smooth GSAP Animations
+* Axios API Integration
+* Login & Registration Forms
+* Protected API Communication
 
 ---
 
 ## 🛠️ Tech Stack
 
+### Backend
+
 * ASP.NET Core Web API
 * Entity Framework Core
 * SQL Server
-* C#
-* ILogger (Built-in Logging)
+* JWT Authentication
+* BCrypt
+* ILogger
+
+### Frontend
+
+* React
+* Vite
+* Tailwind CSS
+* GSAP
+* Axios
 
 ---
 
-## 📂 Current Architecture
+## 🏗️ Architecture
 
-Controller
-   ↓
-Service            
-   ↓
-Repository
-   ↓
-DbContext
-   ↓
+```text
+React Client
+      ↓
+Controllers
+      ↓
+Services
+      ↓
+Repositories
+      ↓
+Entity Framework Core
+      ↓
 SQL Server
 ```
 
 ---
 
-## 📦 Implemented Features (Current Stage)
+## 🔑 Authentication Flow
 
-### 👤 User Management (Repository Layer)
+1. User registers with email and password.
+2. Password is hashed using BCrypt before storage.
+3. User logs in and receives:
 
-* Get user by email
-* Get user by ID
-* Add new user
+   * Access Token
+   * Refresh Token
+4. Access Token is used for authenticated requests.
+5. Refresh Token is stored in the database.
+6. When the Access Token expires:
 
-### 🔑 Refresh Token Management
-
-* Add refresh token
-* Get refresh token by token string
-* Get all refresh tokens for a user
-* Remove a specific refresh token
-* Remove all refresh tokens of a user
+   * Refresh Token is validated.
+   * Old Refresh Token is revoked.
+   * New Access Token and Refresh Token are generated.
+7. The database is updated with the new Refresh Token.
 
 ---
 
-## 📁 Repository Structure
+## 📡 API Endpoints
 
-```text id="d4e5f6"
-Auth Repository
- ├── User-related queries
- ├── Refresh token queries
- ├── Create operations
- ├── Delete operations
- └── Logging using ILogger
+### Authentication
+
+```http
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/refresh-token
 ```
 
 ---
 
-## ⚙️ Project Status
+## 📂 Project Structure
 
-🚧 Currently under development
-🔜 Upcoming features:
+```text
+Backend
+├── Controllers
+├── Services
+├── Repositories
+├── Middleware
+├── Data
+├── Models
+└── DTOs
 
-* JWT Authentication (Access & Refresh Tokens)
-* Login & Registration endpoints
-* Auth Service layer implementation
-* Password hashing (BCrypt)
-* Global exception handling middleware
-
----
-
-## 🎯 Purpose of This Project
-
-The goal of this project is to:
-
-* Understand clean backend architecture
-* Practice Repository Pattern in real scenarios
-* Build a real-world authentication system step by step
-* Improve ASP.NET Core backend development skills
+Frontend
+├── Components
+├── Pages
+├── Animations
+├── Services
+└── Assets
+```
 
 ---
 
-## 📌 Note
+## 🎨 Frontend Experience
 
-This project is continuously evolving. Features will be added and improved as learning progresses.
+The frontend includes smooth page transitions and interactive animations powered by GSAP, creating a modern and engaging user experience for login and registration workflows.
+
+---
+
+## 📈 Future Improvements
+
+* Role-Based Authorization
+* Email Verification
+* Password Reset Functionality
+* Docker Support
+* PostgreSQL Support
+* CI/CD Pipeline
+* Cloud Deployment (Render + Vercel)
+
+---
+
+## 📌 Project Status
+
+🚀 Active Development
+
+This project started as a backend authentication practice project and has evolved into a full-stack authentication system with secure token-based authentication and a modern animated frontend.
