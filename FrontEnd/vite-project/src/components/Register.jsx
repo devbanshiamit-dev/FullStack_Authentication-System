@@ -2,8 +2,67 @@ import React from 'react';
 import { useRef } from "react";
 import gsap from 'gsap';
 import { useEffect } from 'react';
+import { useState } from "react";
+import axios from "axios";
 
 const Register = () => {
+
+    const [registerData, setRegisterData] = useState({
+        userName: "",
+        email: "",
+        password: "",
+        phoneNumber: ""
+    });
+
+    const [loginData, setLoginData] = useState({
+        email: "",
+        password: ""
+    });
+
+    const loginUser = async () => {
+        try{
+            const response = await axios.post(
+                "https://localhost:7020/api/Auth/login",
+                loginData
+            );
+
+            console.log(response.data);
+            alert("Login Successful");
+
+        } catch (error) {
+            console.log(error.response?.data);
+        }
+    };
+
+    const registerUser = async () => {
+        try {
+
+            const response = await axios.post(
+                "https://localhost:7020/api/Auth/register",
+                registerData
+            );
+
+            console.log(response.data);
+            alert("Registration Successful");
+
+        } catch (error) {
+            console.log(error.response?.data);
+        }
+    };
+
+    function clears() {
+        setRegisterData({
+            userName: "",
+            email: "",
+            password: "",
+            phoneNumber: ""
+        });
+
+        setLoginData({
+            email:"",
+            password:"",
+        });
+    }
 
 
     const regCard = useRef(null);
@@ -66,34 +125,65 @@ const Register = () => {
                         <input
                             type="text"
                             placeholder="Enter Your Name"
+                            value={registerData.userName}
                             className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/20 text-white
-                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"/>
+                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"
+                            onChange={(e) =>
+                                setRegisterData({
+                                    ...registerData,
+                                    userName: e.target.value
+                                })
+                            }
+                        />
 
                         <input
                             type="email"
                             placeholder="Enter Your Emai"
+                            value={registerData.email}
                             className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/20 text-white
-                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"/>
+                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"
+                            onChange={(e) =>
+                                setRegisterData({
+                                    ...registerData,
+                                    email: e.target.value
+                                })
+                            }
+                        />
 
                         <input
                             type="password"
                             placeholder="Enter Your Password"
+                            value={registerData.password}
                             className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/20 text-white
-                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"/>
+                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"
+                            onChange={(e) =>
+                                setRegisterData({
+                                    ...registerData,
+                                    password: e.target.value
+                                })
+                            } />
 
                         <input
                             type="text"
                             placeholder="Enter Your Number"
+                            value={registerData.phoneNumber}
                             className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/20 text-white
-                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"/>
+                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"
+                            onChange={(e) =>
+                                setRegisterData({
+                                    ...registerData,
+                                    phoneNumber: e.target.value
+                                })
+                            } />
+
                     </div>
 
                     <div className="flex gap-4 justify-end">
-                        <button className="bg-green-700 text-white px-5 py-2 rounded-lg hover:bg-green-800 transition-all duration-300">
+                        <button onClick={registerUser} className="bg-green-700 text-white px-5 py-2 rounded-lg hover:bg-green-800 transition-all duration-300">
                             Submit
                         </button>
 
-                        <button className="bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition-all duration-300">
+                        <button  onClick={clears} className="bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition-all duration-300">
                             Clear
                         </button>
                     </div>
@@ -125,23 +215,39 @@ const Register = () => {
                         <input
                             type="email"
                             placeholder="Enter Your Emai"
+                            value ={loginData.email}
                             className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/20 text-white
-                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"/>
+                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"
+                         onChange={(e)=>{
+                            setLoginData({
+                                ...loginData,
+                                email: e.target.value
+                            })
+                         }}
+                         />
 
                         <input
                             type="password"
                             placeholder="Enter Your Password"
+                            value={loginData.password}
                             className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/20 text-white
-                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"/>
+                         placeholder:text-white/70 outline-none focus:border-white/50 focus:bg-white/25 transition-all duration-300"
+                         onChange={(e)=>{
+                            setLoginData({
+                                ...loginData,
+                                password: e.target.value
+                            })
+                         }}
+                         />
 
                     </div>
 
                     <div className="flex gap-4 justify-end">
-                        <button className="bg-green-700 text-white px-5 py-2 rounded-lg hover:bg-green-800 transition-all duration-300">
+                        <button onClick={loginUser} className="bg-green-700 text-white px-5 py-2 rounded-lg hover:bg-green-800 transition-all duration-300">
                             Submit
                         </button>
 
-                        <button className="bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition-all duration-300">
+                        <button onClick={clears} className="bg-gray-200 px-5 py-2 rounded-lg hover:bg-gray-300 transition-all duration-300">
                             Clear
                         </button>
                     </div>
